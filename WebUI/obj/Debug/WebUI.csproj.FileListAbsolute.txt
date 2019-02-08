@@ -1,0 +1,9 @@
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll.config
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\bin\WebUI.pdb
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCompileInputs.cache
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
+C:\Users\pedro.ferraz\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
