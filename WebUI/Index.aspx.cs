@@ -33,6 +33,11 @@ namespace WebUI
             return Convert.ToInt64(this.InputIdDiretorioCorrente.Value);
         }
 
+        private long PegarIdArquivoSelecionado()
+        {
+            return Convert.ToInt64(this.InputIdArquivoSelecionado.Value);
+        }
+
         private void ListarArquivos(Arquivo diretorio)
         {            
 
@@ -107,7 +112,7 @@ namespace WebUI
                     + "</td>"
                     + $"<td>{arquivo.DataCriacao.ToString()}</td>"
                     + "<td>"
-                    + "<button type='button' btn='btnExcluirArquivo'>Excluir</button>"
+                    + $"<button type='button' btn='btnExcluirArquivo' onclick='excluirArquivo(\"{arquivo.IdArquivo}\")'>Excluir</button>"
                     + "</td>"
                     + "</tr>"
                 );
@@ -132,6 +137,13 @@ namespace WebUI
             };
 
             ArquivoRepository.Add(novoDiretorio);
+        }
+
+        protected void ExcluirDiretorio_Click(object sender, EventArgs e)
+        {
+            long idArquivo = PegarIdArquivoSelecionado();
+
+            ArquivoRepository.Delete(idArquivo);
         }
     }
 }

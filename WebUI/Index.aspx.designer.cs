@@ -49,6 +49,15 @@ namespace WebUI {
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden InputIdDiretorioCorrente;
         
         /// <summary>
+        /// InputIdArquivoSelecionado control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden InputIdArquivoSelecionado;
+        
+        /// <summary>
         /// ContainerTabela control.
         /// </summary>
         /// <remarks>
@@ -56,5 +65,14 @@ namespace WebUI {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ContainerTabela;
+        
+        /// <summary>
+        /// btnExcluirDiretorioSrv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnExcluirDiretorioSrv;
     }
 }

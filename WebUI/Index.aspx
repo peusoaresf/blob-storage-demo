@@ -38,8 +38,10 @@
         <fieldset class="caixa">
             <legend runat="server" id="LegendDiretorioCorrente">Root</legend>
             <input type="hidden" id="InputIdDiretorioCorrente" runat="server" />
+            <input type="hidden" id="InputIdArquivoSelecionado" runat="server" />
 
             <div runat="server" id="ContainerTabela"></div>
+            <asp:Button OnClick="ExcluirDiretorio_Click" ID="btnExcluirDiretorioSrv" style="display:none" runat="server" />
         </fieldset>
     </form>
 
@@ -77,6 +79,11 @@
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
       crossorigin="anonymous"></script>
     <script>
+        const excluirArquivo = function (idArquivo) {
+            $("#InputIdArquivoSelecionado").val(idArquivo);
+            $("#btnExcluirDiretorioSrv").click();
+        };
+
         $(document).ready(function () {
 
             $("#btnCriarDiretorio").click(function () {
