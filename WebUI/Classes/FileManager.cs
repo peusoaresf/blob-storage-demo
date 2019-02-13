@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace WebUI.Classes
 {
@@ -14,17 +15,67 @@ namespace WebUI.Classes
 
         public async Task<string> Upload(Stream stream, string fileUrl)
         {
-            await Task.Run(() =>
-            {
-                Thread.Sleep(1000);
-            });
+            await Sleep();
 
-            using (FileStream fileStream = System.IO.File.Create(_baseUrl + fileUrl, (int) stream.Length))
-            {
+            Directory.CreateDirectory(_baseUrl + Path.GetDirectoryName(fileUrl));
+
+            using (FileStream fileStream = System.IO.File.Create(_baseUrl + fileUrl, stream.Length > 0 ? (int) stream.Length : 1))
+            {                
                 stream.CopyTo(fileStream);
             }
 
             return "success";
+        }
+
+        public async Task<string> Delete(Arquivo arquivo)
+        {
+            await Sleep();
+
+            if (File.Exists(_baseUrl + arquivo.Url))
+            {
+                File.Delete(_baseUrl + arquivo.Url);
+            }
+
+            return "success";
+        }
+
+        public async Task<string> Download(Arquivo arquivo)
+        {
+            await Sleep();
+
+            Stream stream = System.IO.File.Open(_baseUrl + arquivo.Url, FileMode.Open);
+
+            return PrepararJson(arquivo, stream);
+        }
+
+        private string PrepararJson(Arquivo arquivo, Stream stream)
+        {
+            string json = String.Empty;
+
+            using (stream)
+            {
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    var jss = new JavaScriptSerializer();
+
+                    json = jss.Serialize(new
+                    {
+                        NomeArquivo = arquivo.Nome,
+                        MimeType = MimeMapping.GetMimeMapping(arquivo.Nome),
+                        Buffer = br.ReadBytes((int) stream.Length)
+                    });
+                }
+            }
+
+            return json;
+        }
+
+        private async Task Sleep()
+        {
+            await Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+            });
         }
     }
 

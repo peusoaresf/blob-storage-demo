@@ -29,9 +29,31 @@ namespace WebUI.Ajax.File
         private async Task<string> HandleFileUpload()
         {            
             HttpPostedFile httpPostedFile = Request.Files["file"];
+            
+            string urlArquivo = CriarReferenciaArquivo(httpPostedFile.FileName);
 
             var fileManager = new FileManager();
-            return await fileManager.Upload(httpPostedFile.InputStream, httpPostedFile.FileName);
+
+            return await fileManager.Upload(httpPostedFile.InputStream, urlArquivo);
+        }
+
+        private string CriarReferenciaArquivo(string nomeArquivo)
+        {
+            long idDiretorio = Convert.ToInt64(Request.Params["idDiretorio"]);
+
+            Arquivo parent = ArquivoRepository.FindById(idDiretorio);
+
+            var novoArquivo = new Arquivo()
+            {
+                IsDiretorio = false,
+                Nome = nomeArquivo,
+                Url = $"{parent.Url}{nomeArquivo}",
+                Parent = parent
+            };
+
+            ArquivoRepository.Add(novoArquivo);
+
+            return novoArquivo.Url;
         }
     }   
 }

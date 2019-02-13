@@ -12,6 +12,11 @@ namespace WebUI
 {
     public partial class Index : System.Web.UI.Page
     {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            LimparMensagemErro();
+        }
+
         protected void Page_LoadComplete(object sender, EventArgs e)
         {
             Arquivo diretorio; 
@@ -27,7 +32,7 @@ namespace WebUI
 
             ListarArquivos(diretorio);
         }
-
+        
         private long PegarIdDiretorioCorrente()
         {
             return Convert.ToInt64(this.InputIdDiretorioCorrente.Value);
@@ -50,8 +55,26 @@ namespace WebUI
 
         private void SinalizarDiretorioCorrente(Arquivo arquivo)
         {
-            this.LegendDiretorioCorrente.InnerText = arquivo.Nome;
             this.InputIdDiretorioCorrente.Value = arquivo.IdArquivo.ToString();
+            this.LegendDiretorioCorrente.InnerHtml = MontarNavegacaoDiretorio(arquivo);
+        }
+
+        private string MontarNavegacaoDiretorio(Arquivo arquivo)
+        {
+            Arquivo aux = arquivo;
+
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.Insert(0, $"\\{aux.Nome}");
+            aux = aux.Parent;
+
+            while (aux != null)
+            {
+                stringBuilder.Insert(0, $"\\<a href='#' onclick='abrirDiretorio(\"{aux.IdArquivo}\")'>{aux.Nome}</a>");
+                aux = aux.Parent;
+            }
+
+            return stringBuilder.ToString();
         }
 
         private void MontarTabela(IEnumerable<Arquivo> arquivos)
@@ -80,7 +103,7 @@ namespace WebUI
             return
                 "<thead>"
                 + "<tr>"
-                + "<th class='cabecalho' style='width: 200px'>Nome</th>"
+                + "<th class='cabecalho' style='width: 250px'>Nome</th>"
                 + "<th class='cabecalho' style='width: 150px'>Data Criação</th>"
                 + "<th class='cabecalho' style='width: 50px'></th>"
                 + "</tr>"
@@ -105,10 +128,22 @@ namespace WebUI
 
             foreach (var arquivo in arquivos)
             {
+                string titleArquivo = arquivo.IsDiretorio 
+                                        ? "Navegar para o diretório" 
+                                        : "Baixar arquivo";
+
+                string clickArquivo = arquivo.IsDiretorio 
+                                        ? $"onclick = 'abrirDiretorio(\"{arquivo.IdArquivo}\")'" 
+                                        : $"onclick = 'baixarArquivo(\"{arquivo.IdArquivo}\")'";
+
+                string iconeArquivo = arquivo.IsDiretorio
+                                        ? "folder"
+                                        : "insert_drive_file";
+
                 stringBuilder.Append(
                     "<tr>"
                     + "<td>"
-                    + $"<a href='#'>{arquivo.Nome}</a>"
+                    + $"<i class='material-icons'>{iconeArquivo}</i><a href='#' title='{titleArquivo}' {clickArquivo}><span>{arquivo.Nome}</span></a>"
                     + "</td>"
                     + $"<td>{arquivo.DataCriacao.ToString()}</td>"
                     + "<td>"
@@ -121,6 +156,16 @@ namespace WebUI
             stringBuilder.Append("</tbody>");
 
             return stringBuilder.ToString();
+        }
+         
+        private void ExibirMensagemErro(string msg)
+        {
+            this.MensagemErro.InnerText = msg;
+        }
+
+        private void LimparMensagemErro()
+        {
+            this.MensagemErro.InnerText = String.Empty;
         }
 
         protected void CriarDiretorio_Click(object sender, EventArgs e)
@@ -139,11 +184,21 @@ namespace WebUI
             ArquivoRepository.Add(novoDiretorio);
         }
 
-        protected void ExcluirDiretorio_Click(object sender, EventArgs e)
+        protected async void ExcluirDiretorio_Click(object sender, EventArgs e)
         {
             long idArquivo = PegarIdArquivoSelecionado();
 
-            ArquivoRepository.Delete(idArquivo);
-        }
+            if (ArquivoRepository.FindWhereParentEquals(idArquivo).Any())
+            {
+                ExibirMensagemErro("Diretório não pode ser excluído pois possui dependentes");                
+            }
+            else
+            {
+                var fileManager = new FileManager();
+                await fileManager.Delete(ArquivoRepository.FindById(idArquivo));
+
+                ArquivoRepository.Delete(idArquivo);
+            }
+        }        
     }
 }

@@ -22,20 +22,19 @@ namespace WebUI.Classes
             {
                 root.IdArquivo,
                 root
-            }
-            ,
+            }/*,
             {
                 2,
                 new Arquivo()
                 {
                     IdArquivo = 2,
                     Nome = "antigo painel de conexão.txt",
-                    Url = "/GED_local/antigo painel de conexão.txt",
+                    Url = "/antigo painel de conexão.txt",
                     DataCriacao = new DateTime(2019, 2, 8),
                     IsDiretorio = false,
                     Parent = root
                 }
-            }
+            }*/
         };
 
         public static void Add(Arquivo arquivo)
@@ -56,7 +55,7 @@ namespace WebUI.Classes
 
         public static IEnumerable<Arquivo> FindAll()
         {
-            return _arquivos.Values;
+            return _arquivos.Values.OrderBy(x => !x.IsDiretorio);
         }
 
         public static Arquivo FindById(long id)
@@ -89,7 +88,7 @@ namespace WebUI.Classes
                 }
             }
 
-            return result;
+            return result.OrderBy(x => !x.IsDiretorio);
         }        
     }
 }

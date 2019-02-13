@@ -12,7 +12,7 @@ C:\Repositorio\BlobStorageDemo\WebUI\bin\WebUI.dll
 C:\Repositorio\BlobStorageDemo\WebUI\bin\WebUI.pdb
 C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
 C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCompileInputs.cache
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
+C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
