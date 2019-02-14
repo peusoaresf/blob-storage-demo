@@ -19,6 +19,8 @@
 </head>
 <body>
     <form runat="server">
+        <p id="Blobs" runat="server" />
+
         <fieldset class="caixa">
             <legend>Criar Diretório</legend>
             <input type="text" id="InputNomeDiretorio" runat="server" />
@@ -34,9 +36,11 @@
 
         <br />
         <br />
-        <hr />
 
         <p id="MensagemErro" runat="server"></p>
+        <div id="containerProgresso"></div>
+
+        <hr />
 
         <fieldset class="caixa">
             <legend runat="server" id="LegendDiretorioCorrente">Root</legend>
@@ -120,8 +124,42 @@
             
             $("#btnEnviarArquivo").click(function () {
                 if ($("#inputFile")[0].files.length) {
-                    var fileUploader = new myJs.FileUploader($("#inputFile")[0].files);
-                    
+                    var fileUploader = new myJs.FileUploader($("#inputFile")[0].files, $("#InputIdDiretorioCorrente").val());
+
+                    let contador = 0;
+
+                    fileUploader.onUploadStarted = function (oFileHelper) {
+                        oFileHelper.idProgresso = contador++;
+                        $("#containerProgresso").append(
+                            '<p>' + oFileHelper.file.name + ':<span style="left-margin: 10px" id="progressoUpload' + oFileHelper.idProgresso + '">0</span></p>'
+                        );
+                    };
+
+                    fileUploader.onUploadProgress = function (oFileHelper, progress) {
+                        var idProgresso = "#progressoUpload" + oFileHelper.idProgresso;
+                        $(idProgresso).text((progress * 100).toFixed(2) + "%");
+                    };
+
+                    fileUploader.onUploadFinishing = function (oFileHelper) {
+                        var idProgresso = "#progressoUpload" + oFileHelper.idProgresso;
+                        $(idProgresso).text("Finalizando upload....");
+                    };
+
+                    fileUploader.onUploadFinished = function (oFileHelper) {
+                        var idProgresso = "#progressoUpload" + oFileHelper.idProgresso;
+                        $(idProgresso).text("Upload concluído com sucesso.");
+                    };
+
+                    fileUploader.onUploadError = function (oFileHelper) {
+                        var idProgresso = "#progressoUpload" + oFileHelper.idProgresso;
+                        $(idProgresso).text("Erro no upload. Tente novamente.");
+                    };
+
+                    fileUploader.onAllUploadFinished = function () {
+                        alert("todos uploads concluídos");
+                        $("form")[0].submit();
+                    };
+
                     fileUploader.start();
 
                     /*var formData = new FormData();

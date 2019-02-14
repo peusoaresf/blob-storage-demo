@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace WebUI.Classes
 {
-    public class ArquivoRepository
+    public class MemoryArquivoRepository : IArquivoRepository
     {
+        private static long _identity = 1;
+
         private static Arquivo root = new Arquivo()
         {
-            IdArquivo = 1,
+            IdArquivo = _identity,
             Nome = "GED_local",
-            Url = "/",
+            Url = "",
             DataCriacao = new DateTime(2019, 2, 7),
             IsDiretorio = true,
             Parent = null
@@ -37,10 +41,12 @@ namespace WebUI.Classes
             }*/
         };
 
-        public static void Add(Arquivo arquivo)
+        public async Task Add(Arquivo arquivo)
         {
-            var now = DateTime.Now;
-            long id = now.Ticks;
+            await Sleep();
+
+            long id = ++_identity;
+            var now = DateTime.Now;            
 
             arquivo.IdArquivo = id;
             arquivo.DataCriacao = now;
@@ -48,24 +54,39 @@ namespace WebUI.Classes
             _arquivos.Add(id, arquivo);
         }
 
-        public static void Delete(long id)
+        public async Task Update(Arquivo arquivo)
         {
+            await Sleep();
+
+            _arquivos[arquivo.IdArquivo] = arquivo;
+        }
+
+        public async Task Delete(long id)
+        {
+            await Sleep();
+
             _arquivos.Remove(id);
         }
 
-        public static IEnumerable<Arquivo> FindAll()
+        public async Task<IEnumerable<Arquivo>> FindAll()
         {
+            await Sleep();
+
             return _arquivos.Values.OrderBy(x => !x.IsDiretorio);
         }
 
-        public static Arquivo FindById(long id)
+        public async Task<Arquivo> FindById(long id)
         {
+            await Sleep();
+
             return _arquivos[id];
         }
 
-        public static Arquivo FindWhereParentIsNull()
+        public async Task<Arquivo> FindWhereParentIsNull()
         {
-            foreach (var arquivo in FindAll())
+            IEnumerable<Arquivo> arquivos = await FindAll();
+
+            foreach (var arquivo in arquivos)
             {
                 if (arquivo.Parent == null)
                 {
@@ -76,11 +97,13 @@ namespace WebUI.Classes
             return null;
         }
 
-        public static IEnumerable<Arquivo> FindWhereParentEquals(long id)
+        public async Task<IEnumerable<Arquivo>> FindWhereParentEquals(long id)
         {
+            IEnumerable<Arquivo> arquivos = await FindAll();
+
             var result = new List<Arquivo>();
 
-            foreach (var arquivo in FindAll())
+            foreach (var arquivo in arquivos)
             {
                 if (arquivo.Parent != null && arquivo.Parent.IdArquivo == id)
                 {
@@ -89,6 +112,14 @@ namespace WebUI.Classes
             }
 
             return result.OrderBy(x => !x.IsDiretorio);
-        }        
+        }
+
+        private async Task Sleep()
+        {
+            await Task.Run(() =>
+            {
+                Thread.Sleep(10);
+            });
+        }
     }
 }

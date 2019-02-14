@@ -13,8 +13,12 @@ namespace WebUI.Ajax.File
 {
     public partial class FileDownload : System.Web.UI.Page
     {
+        private IArquivoRepository _arquivoRepository;
+
         protected async void Page_Load(object sender, EventArgs e)
         {
+            _arquivoRepository = ArquivoRepositoryFactory.Create();
+
             if (!IsPostBack)
             {
                 Response.Clear();
@@ -28,18 +32,18 @@ namespace WebUI.Ajax.File
 
         private async Task<string> HandleFileDownload()
         {
-            Arquivo arquivo = PegarArquivoRequest();
+            Arquivo arquivo = await PegarArquivoRequest();
 
-            var fileManager = new FileManager();
+            FileManager fileManager = FileManagerFactory.Create();
 
             return await fileManager.Download(arquivo);
         }
 
-        private Arquivo PegarArquivoRequest()
+        private async Task<Arquivo> PegarArquivoRequest()
         {
             long idArquivo = Convert.ToInt64(Request.Params["idArquivo"]);
 
-            return ArquivoRepository.FindById(idArquivo);
+            return await _arquivoRepository.FindById(idArquivo);
         }        
     }
 }

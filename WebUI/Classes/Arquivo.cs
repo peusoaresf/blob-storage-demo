@@ -9,6 +9,7 @@ namespace WebUI.Classes
     {
         public bool IsDiretorio { get; set; }
         public long IdArquivo { get; set; }
+        public long Tamanho { get; set; }
         public string Nome { get; set; }
         public string Url { get; set; }
         public Arquivo Parent { get; set; }

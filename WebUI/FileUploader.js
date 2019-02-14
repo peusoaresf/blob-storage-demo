@@ -1,4 +1,25 @@
-﻿const myJs = (function () {
+﻿function yieldingLoop(count, chunksize, callback, finished) {
+    var i = 0;
+    (function chunk() {
+        var end = Math.min(i + chunksize, count);
+        for (; i < end; ++i) {
+            callback.call(null, i);
+        }
+        if (i < count) {
+            setTimeout(chunk, 0);
+        } else {
+            finished.call(null);
+        }
+    })();
+}
+
+yieldingLoop(1000000, 1000, function (i) {
+    // use i here
+}, function () {
+    // loop done here
+});
+
+const myJs = (function () {
     const getNumberOfChunks = function (self, fileSize) {
         return fileSize < self.BYTES_PER_CHUNK
             ? 1
@@ -32,7 +53,7 @@
     const uploadFile = function (self, oFileHelper) {
         return new Promise(function (resolve, reject) {
             let file = oFileHelper.file,
-                fileSize = file.size;
+                fileSize = file.size ? file.size : 1;
 
             let startReading = 0,
                 endReading = self.BYTES_PER_CHUNK,
@@ -72,6 +93,7 @@
 
     const mergeChunksPromise = function (oFileHelper) {
         var formData = new FormData();
+        formData.append("parentFolderId", oFileHelper.parentFolderId);
         formData.append("fileName", oFileHelper.file.name);
         formData.append("token", oFileHelper.token);
 
@@ -84,22 +106,28 @@
         });
     };
 
-    function FileHelper(oFile) {
+    function FileHelper(oFile, sParentFolderId) {
         this.file = oFile;
+        this.parentFolderId = sParentFolderId;
         this.token = oFile.name + (new Date()).getTime();
     };
 
-    function FileUploader(aFile, iBytesPerChunk) {
+    function FileUploader(aFile, sParentFolderId, iBytesPerChunk) {
         this.windowReference = window;
         this.BYTES_PER_CHUNK = iBytesPerChunk || 77570;
         this.files = [];
         for (var i = 0, length = aFile.length; i < length; i++) {
-            this.files.push(new FileHelper(aFile[i]));
+            this.files.push(new FileHelper(aFile[i], sParentFolderId));
         }
     };
 
     FileUploader.prototype.start = function () {
-        var self = this;
+        let self = this,
+            iCompleted = 0;
+
+        const isAllFinished = function (numberUploadsCompleted) {
+            return self.files.length === numberUploadsCompleted;
+        };
 
         for (let i = 0, length = self.files.length; i < length; i++) {
             self.onUploadStarted(self.files[i]);
@@ -111,9 +139,15 @@
                     mergeChunksPromise(oFileHelper)
                         .then(function () {
                             self.onUploadFinished(oFileHelper);
+                            if (isAllFinished(++iCompleted)) {
+                                self.onAllUploadFinished();
+                            }
                         })
                         .catch(function (err) {
                             self.onUploadError(oFileHelper, err);
+                            if (isAllFinished(++iCompleted)) {
+                                self.onAllUploadFinished();
+                            }
                         });
                 })
                 .catch(function (err, oFileHelper) {
@@ -136,6 +170,10 @@
 
     FileUploader.prototype.onUploadFinished = function (oFileHelper) {
         console.log(oFileHelper.file.name + " upload finished!");
+    };
+
+    FileUploader.prototype.onAllUploadFinished = function () {
+        console.log("all uploads finished!");
     };
 
     FileUploader.prototype.onUploadError = function (oFileHelper, error) {

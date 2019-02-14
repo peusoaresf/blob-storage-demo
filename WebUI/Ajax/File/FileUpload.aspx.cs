@@ -13,45 +13,48 @@ namespace WebUI.Ajax.File
 {
     public partial class FileUpload : System.Web.UI.Page
     {
+        private IArquivoRepository _arquivoRepository;
+
         protected async void Page_Load(object sender, EventArgs e)
         {
+            _arquivoRepository = ArquivoRepositoryFactory.Create();
+
             if (!IsPostBack)
             {
                 Response.Clear();
 
-                string result = await HandleFileUpload();               
+                long result = await HandleFileUpload();               
                 
                 Response.Write(result);                
                 Response.End();                
             }
         }
 
-        private async Task<string> HandleFileUpload()
+        private async Task<long> HandleFileUpload()
         {            
             HttpPostedFile httpPostedFile = Request.Files["file"];
             
-            string urlArquivo = CriarReferenciaArquivo(httpPostedFile.FileName);
+            string urlArquivo = await CriarReferenciaArquivo(httpPostedFile);
 
-            var fileManager = new FileManager();
+            FileManager fileManager = FileManagerFactory.Create();
 
             return await fileManager.Upload(httpPostedFile.InputStream, urlArquivo);
         }
 
-        private string CriarReferenciaArquivo(string nomeArquivo)
+        private async Task<string> CriarReferenciaArquivo(HttpPostedFile arquivo)
         {
             long idDiretorio = Convert.ToInt64(Request.Params["idDiretorio"]);
 
-            Arquivo parent = ArquivoRepository.FindById(idDiretorio);
+            Arquivo parent = await _arquivoRepository.FindById(idDiretorio);
 
-            var novoArquivo = new Arquivo()
-            {
-                IsDiretorio = false,
-                Nome = nomeArquivo,
-                Url = $"{parent.Url}{nomeArquivo}",
-                Parent = parent
-            };
+            Arquivo novoArquivo = ArquivoFactory.Create();
+            novoArquivo.IsDiretorio = false;
+            novoArquivo.Nome = arquivo.FileName;
+            novoArquivo.Tamanho = arquivo.ContentLength;
+            novoArquivo.Url = $"{parent.Url}{arquivo.FileName}";
+            novoArquivo.Parent = parent;
 
-            ArquivoRepository.Add(novoArquivo);
+            await _arquivoRepository.Add(novoArquivo);
 
             return novoArquivo.Url;
         }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -12,25 +14,44 @@ namespace WebUI
 {
     public partial class Index : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        private IArquivoRepository _arquivoRepository;
+
+        protected async void Page_Load(object sender, EventArgs e)
         {
+            //BlobStorageManager blobStorageManager = new BlobStorageManager();
+
+            // C:\Users\pedro.ferraz\Downloads
+            /*using (Stream stream = System.IO.File.Open("C:\\Users\\pedro.ferraz\\Downloads\\microsoftazurestorageemulator.msi", FileMode.Open))
+            {
+                await blobStorageManager.UploadBlob(stream, "Pedro/microsoftazurestorageemulator.msi");
+            }*/
+
+            /*List<string> blobs = await blobStorageManager.ListBlobs("Pedro/");
+
+            foreach (var blob in blobs)
+            {
+                this.Blobs.InnerText += blob;
+            }*/
+
+            _arquivoRepository = ArquivoRepositoryFactory.Create();
+
             LimparMensagemErro();
         }
 
-        protected void Page_LoadComplete(object sender, EventArgs e)
+        protected async void Page_LoadComplete(object sender, EventArgs e)
         {
-            Arquivo diretorio; 
-
+            Arquivo diretorio;
+            
             if (!IsPostBack)
             {
-                diretorio = ArquivoRepository.FindWhereParentIsNull();                
+                diretorio = await _arquivoRepository.FindWhereParentIsNull();                
             }
             else
             {
-                diretorio = ArquivoRepository.FindById(PegarIdDiretorioCorrente());
+                diretorio = await _arquivoRepository.FindById(PegarIdDiretorioCorrente());
             }
 
-            ListarArquivos(diretorio);
+            await ListarArquivos(diretorio);
         }
         
         private long PegarIdDiretorioCorrente()
@@ -43,12 +64,12 @@ namespace WebUI
             return Convert.ToInt64(this.InputIdArquivoSelecionado.Value);
         }
 
-        private void ListarArquivos(Arquivo diretorio)
+        private async Task ListarArquivos(Arquivo diretorio)
         {            
 
             SinalizarDiretorioCorrente(diretorio);
 
-            IEnumerable<Arquivo> arquivosNoDiretorio = ArquivoRepository.FindWhereParentEquals(diretorio.IdArquivo);
+            IEnumerable<Arquivo> arquivosNoDiretorio = await _arquivoRepository.FindWhereParentEquals(diretorio.IdArquivo);
 
             MontarTabela(arquivosNoDiretorio);
         }
@@ -104,6 +125,7 @@ namespace WebUI
                 "<thead>"
                 + "<tr>"
                 + "<th class='cabecalho' style='width: 250px'>Nome</th>"
+                + "<th class='cabecalho' style='width: 150px'>Tamanho</th>"
                 + "<th class='cabecalho' style='width: 150px'>Data Criação</th>"
                 + "<th class='cabecalho' style='width: 50px'></th>"
                 + "</tr>"
@@ -145,6 +167,7 @@ namespace WebUI
                     + "<td>"
                     + $"<i class='material-icons'>{iconeArquivo}</i><a href='#' title='{titleArquivo}' {clickArquivo}><span>{arquivo.Nome}</span></a>"
                     + "</td>"
+                    + $"<td>{arquivo.Tamanho.ToString()}</td>"
                     + $"<td>{arquivo.DataCriacao.ToString()}</td>"
                     + "<td>"
                     + $"<button type='button' btn='btnExcluirArquivo' onclick='excluirArquivo(\"{arquivo.IdArquivo}\")'>Excluir</button>"
@@ -168,36 +191,35 @@ namespace WebUI
             this.MensagemErro.InnerText = String.Empty;
         }
 
-        protected void CriarDiretorio_Click(object sender, EventArgs e)
+        protected async void CriarDiretorio_Click(object sender, EventArgs e)
         {
             string nomeDiretorio = this.InputNomeDiretorio.Value;
-            Arquivo parent = ArquivoRepository.FindById(PegarIdDiretorioCorrente());
 
-            var novoDiretorio = new Arquivo()
-            {
-                IsDiretorio = true,
-                Nome = nomeDiretorio,
-                Url = $"{parent.Url}{nomeDiretorio}/",
-                Parent = parent
-            };
+            Arquivo parent = await _arquivoRepository.FindById(PegarIdDiretorioCorrente());
 
-            ArquivoRepository.Add(novoDiretorio);
+            Arquivo novoDiretorio = ArquivoFactory.Create();
+            novoDiretorio.IsDiretorio = true;
+            novoDiretorio.Nome = nomeDiretorio;
+            novoDiretorio.Url = $"{parent.Url}{nomeDiretorio}/";
+            novoDiretorio.Parent = parent;
+
+            await _arquivoRepository.Add(novoDiretorio);
         }
 
         protected async void ExcluirDiretorio_Click(object sender, EventArgs e)
         {
             long idArquivo = PegarIdArquivoSelecionado();
 
-            if (ArquivoRepository.FindWhereParentEquals(idArquivo).Any())
+            if ((await _arquivoRepository.FindWhereParentEquals(idArquivo)).Any())
             {
                 ExibirMensagemErro("Diretório não pode ser excluído pois possui dependentes");                
             }
             else
             {
-                var fileManager = new FileManager();
-                await fileManager.Delete(ArquivoRepository.FindById(idArquivo));
+                FileManager fileManager = FileManagerFactory.Create();
+                await fileManager.Delete(await _arquivoRepository.FindById(idArquivo));
 
-                ArquivoRepository.Delete(idArquivo);
+                await _arquivoRepository.Delete(idArquivo);
             }
         }        
     }

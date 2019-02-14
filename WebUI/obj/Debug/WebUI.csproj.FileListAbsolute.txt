@@ -15,7 +15,6 @@ C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompi
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCompileInputs.cache
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
-C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll.config
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.pdb
@@ -26,3 +25,14 @@ C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCom
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CopyComplete
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
 C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
+C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.KeyVault.Core.dll
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.dll
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.dll
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Newtonsoft.Json.dll
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.KeyVault.Core.xml
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.pdb
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.xml
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.pdb
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.xml
+C:\Repositorio\BlobStorageDemo\WebUI\bin\Newtonsoft.Json.xml
