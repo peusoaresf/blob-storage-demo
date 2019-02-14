@@ -11,7 +11,41 @@ namespace WebUI.Classes
 {
     public class FileManager
     {
-        private static string _baseUrl = "C:\\GED_local\\";
+        private static string _baseUrl = "C:\\dev\\ged_repo\\";
+
+        public async Task<string> MergeChunks(string fileUrl, string fileToken)
+        {
+            await Sleep();
+
+            IEnumerable<string> chunks = Directory.GetFiles(_baseUrl + $"tmp{fileToken}").Where(x => x.Contains(fileToken));
+
+            int maxLength = chunks.Max(x => x.Length);
+
+            chunks = chunks.OrderBy(x => x.PadLeft(maxLength, '0'));
+
+            using (FileStream fileStream = System.IO.File.Open(_baseUrl + fileUrl, FileMode.Append))
+            {
+                foreach (var chunk in chunks)
+                {
+                    using (FileStream chunkStream = System.IO.File.Open(chunk, FileMode.Open))
+                    {
+                        byte[] chunkStreamContent = new byte[chunkStream.Length];
+
+                        chunkStream.Read(chunkStreamContent, 0, (int)chunkStream.Length);
+                        fileStream.Write(chunkStreamContent, 0, (int)chunkStream.Length);
+                    }
+                }
+            }
+
+            Directory.Delete(_baseUrl + $"tmp{fileToken}", true);
+
+            return "success";
+        }
+
+        public async Task<string> UploadChunk(Stream stream, string chunkToken)
+        {
+            return await Upload(stream, $"tmp{chunkToken.Substring(chunkToken.IndexOf("-") + 1)}/{chunkToken}.tmp");
+        }
 
         public async Task<string> Upload(Stream stream, string fileUrl)
         {

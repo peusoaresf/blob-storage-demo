@@ -28,7 +28,7 @@
 
         <fieldset class="caixa">
             <legend>Adicionar Arquivo ao Diretório</legend>
-            <input type="file" id="inputFile" />
+            <input type="file" id="inputFile" multiple="multiple" />
             <button type="button" id="btnEnviarArquivo">Enviar</button>
         </fieldset>
 
@@ -52,6 +52,7 @@
       src="https://code.jquery.com/jquery-3.3.1.min.js"
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
       crossorigin="anonymous"></script>
+    <script src="FileUploader.js"></script>
     <script>
         const abrirDiretorio = function (idArquivo) {
             $("#InputIdDiretorioCorrente").val(idArquivo);
@@ -105,7 +106,6 @@
         }
 
         $(document).ready(function () {
-
             $("#btnCriarDiretorio").click(function () {
                 if (!$("#InputNomeDiretorio").val()) {
                     alert("insira o nome do diretório");
@@ -120,7 +120,11 @@
             
             $("#btnEnviarArquivo").click(function () {
                 if ($("#inputFile")[0].files.length) {
-                    var formData = new FormData();
+                    var fileUploader = new myJs.FileUploader($("#inputFile")[0].files);
+                    
+                    fileUploader.start();
+
+                    /*var formData = new FormData();
                     formData.append("file", $("#inputFile")[0].files[0]);
                     formData.append("idDiretorio", $("#InputIdDiretorioCorrente").val());
 
@@ -143,7 +147,7 @@
                     }
                     catch (e) {
                         alert(JSON.stringify(e));
-                    }
+                    }*/
                 }
                 else {
                     alert("selecione um arquivo");

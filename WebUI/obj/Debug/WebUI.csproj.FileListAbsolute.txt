@@ -16,3 +16,13 @@ C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCompileInputs.ca
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
 C:\Repositorio\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojResolveAssemblyReference.cache
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll.config
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\WebUI.pdb
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csprojAssemblyReference.cache
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CoreCompileInputs.cache
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.csproj.CopyComplete
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\obj\Debug\WebUI.pdb
