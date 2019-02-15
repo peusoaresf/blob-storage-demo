@@ -14,10 +14,13 @@ namespace WebUI.Classes
     {
         public async Task<string> DeleteAsync(Arquivo arquivo)
         {
-            CloudBlobContainer container = await GetCloudBlobContainerAsync();
-            CloudBlockBlob blob = container.GetBlockBlobReference(arquivo.Url);
+            if (!arquivo.IsDiretorio)
+            {
+                CloudBlobContainer container = await GetCloudBlobContainerAsync();
+                CloudBlockBlob blob = container.GetBlockBlobReference(arquivo.Url);
 
-            await blob.DeleteAsync();
+                await blob.DeleteAsync();
+            }
 
             return "success";
         }
