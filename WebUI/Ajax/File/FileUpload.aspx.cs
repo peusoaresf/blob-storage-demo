@@ -23,38 +23,34 @@ namespace WebUI.Ajax.File
             {
                 Response.Clear();
 
-                long result = await HandleFileUpload();               
+                long result = await HandleFileUploadAsync();               
                 
                 Response.Write(result);                
                 Response.End();                
             }
         }
 
-        private async Task<long> HandleFileUpload()
+        private async Task<long> HandleFileUploadAsync()
         {            
             HttpPostedFile httpPostedFile = Request.Files["file"];
             
-            string urlArquivo = await CriarReferenciaArquivo(httpPostedFile);
+            string urlArquivo = await CriarReferenciaArquivoAsync(httpPostedFile);
 
-            FileManager fileManager = FileManagerFactory.Create();
+            IFileManager fileManager = FileManagerFactory.Create();
 
-            return await fileManager.Upload(httpPostedFile.InputStream, urlArquivo);
+            return await fileManager.UploadAsync(httpPostedFile.InputStream, urlArquivo);
         }
 
-        private async Task<string> CriarReferenciaArquivo(HttpPostedFile arquivo)
+        private async Task<string> CriarReferenciaArquivoAsync(HttpPostedFile arquivo)
         {
             long idDiretorio = Convert.ToInt64(Request.Params["idDiretorio"]);
 
-            Arquivo parent = await _arquivoRepository.FindById(idDiretorio);
+            Arquivo parent = await _arquivoRepository.FindByIdAsync(idDiretorio);
 
-            Arquivo novoArquivo = ArquivoFactory.Create();
-            novoArquivo.IsDiretorio = false;
-            novoArquivo.Nome = arquivo.FileName;
+            Arquivo novoArquivo = ArquivoFactory.Create(arquivo.FileName, false, parent);
             novoArquivo.Tamanho = arquivo.ContentLength;
-            novoArquivo.Url = $"{parent.Url}{arquivo.FileName}";
-            novoArquivo.Parent = parent;
 
-            await _arquivoRepository.Add(novoArquivo);
+            await _arquivoRepository.AddAsync(novoArquivo);
 
             return novoArquivo.Url;
         }

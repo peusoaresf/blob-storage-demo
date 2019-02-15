@@ -16,23 +16,8 @@ namespace WebUI
     {
         private IArquivoRepository _arquivoRepository;
 
-        protected async void Page_Load(object sender, EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            //BlobStorageManager blobStorageManager = new BlobStorageManager();
-
-            // C:\Users\pedro.ferraz\Downloads
-            /*using (Stream stream = System.IO.File.Open("C:\\Users\\pedro.ferraz\\Downloads\\microsoftazurestorageemulator.msi", FileMode.Open))
-            {
-                await blobStorageManager.UploadBlob(stream, "Pedro/microsoftazurestorageemulator.msi");
-            }*/
-
-            /*List<string> blobs = await blobStorageManager.ListBlobs("Pedro/");
-
-            foreach (var blob in blobs)
-            {
-                this.Blobs.InnerText += blob;
-            }*/
-
             _arquivoRepository = ArquivoRepositoryFactory.Create();
 
             LimparMensagemErro();
@@ -44,14 +29,14 @@ namespace WebUI
             
             if (!IsPostBack)
             {
-                diretorio = await _arquivoRepository.FindWhereParentIsNull();                
+                diretorio = await _arquivoRepository.FindWhereParentIsNullAsync();                
             }
             else
             {
-                diretorio = await _arquivoRepository.FindById(PegarIdDiretorioCorrente());
+                diretorio = await _arquivoRepository.FindByIdAsync(PegarIdDiretorioCorrente());
             }
 
-            await ListarArquivos(diretorio);
+            await ListarArquivosAsync(diretorio);
         }
         
         private long PegarIdDiretorioCorrente()
@@ -64,12 +49,12 @@ namespace WebUI
             return Convert.ToInt64(this.InputIdArquivoSelecionado.Value);
         }
 
-        private async Task ListarArquivos(Arquivo diretorio)
+        private async Task ListarArquivosAsync(Arquivo diretorio)
         {            
 
             SinalizarDiretorioCorrente(diretorio);
 
-            IEnumerable<Arquivo> arquivosNoDiretorio = await _arquivoRepository.FindWhereParentEquals(diretorio.IdArquivo);
+            IEnumerable<Arquivo> arquivosNoDiretorio = await _arquivoRepository.FindWhereParentEqualsAsync(diretorio.IdArquivo);
 
             MontarTabela(arquivosNoDiretorio);
         }
@@ -191,35 +176,33 @@ namespace WebUI
             this.MensagemErro.InnerText = String.Empty;
         }
 
-        protected async void CriarDiretorio_Click(object sender, EventArgs e)
+        protected async void CriarDiretorioAsync_Click(object sender, EventArgs e)
         {
             string nomeDiretorio = this.InputNomeDiretorio.Value;
 
-            Arquivo parent = await _arquivoRepository.FindById(PegarIdDiretorioCorrente());
+            Arquivo parent = await _arquivoRepository.FindByIdAsync(PegarIdDiretorioCorrente());
 
-            Arquivo novoDiretorio = ArquivoFactory.Create();
-            novoDiretorio.IsDiretorio = true;
-            novoDiretorio.Nome = nomeDiretorio;
-            novoDiretorio.Url = $"{parent.Url}{nomeDiretorio}/";
-            novoDiretorio.Parent = parent;
+            Arquivo novoDiretorio = ArquivoFactory.Create(nomeDiretorio, true, parent);
 
-            await _arquivoRepository.Add(novoDiretorio);
+            await _arquivoRepository.AddAsync(novoDiretorio);
+
+            this.InputNomeDiretorio.Value = String.Empty;
         }
 
-        protected async void ExcluirDiretorio_Click(object sender, EventArgs e)
+        protected async void ExcluirDiretorioAsync_Click(object sender, EventArgs e)
         {
             long idArquivo = PegarIdArquivoSelecionado();
 
-            if ((await _arquivoRepository.FindWhereParentEquals(idArquivo)).Any())
+            if ((await _arquivoRepository.FindWhereParentEqualsAsync(idArquivo)).Any())
             {
                 ExibirMensagemErro("Diretório não pode ser excluído pois possui dependentes");                
             }
             else
             {
-                FileManager fileManager = FileManagerFactory.Create();
-                await fileManager.Delete(await _arquivoRepository.FindById(idArquivo));
+                IFileManager fileManager = FileManagerFactory.Create();
+                await fileManager.DeleteAsync(await _arquivoRepository.FindByIdAsync(idArquivo));
 
-                await _arquivoRepository.Delete(idArquivo);
+                await _arquivoRepository.DeleteAsync(idArquivo);
             }
         }        
     }

@@ -1,25 +1,4 @@
-﻿function yieldingLoop(count, chunksize, callback, finished) {
-    var i = 0;
-    (function chunk() {
-        var end = Math.min(i + chunksize, count);
-        for (; i < end; ++i) {
-            callback.call(null, i);
-        }
-        if (i < count) {
-            setTimeout(chunk, 0);
-        } else {
-            finished.call(null);
-        }
-    })();
-}
-
-yieldingLoop(1000000, 1000, function (i) {
-    // use i here
-}, function () {
-    // loop done here
-});
-
-const myJs = (function () {
+﻿const myJs = (function () {
     const getNumberOfChunks = function (self, fileSize) {
         return fileSize < self.BYTES_PER_CHUNK
             ? 1
@@ -59,11 +38,56 @@ const myJs = (function () {
                 endReading = self.BYTES_PER_CHUNK,
                 numberOfChunks = getNumberOfChunks(self, fileSize),
                 chunksCompleted = 0,
-                chunkOrder = 1;
+                chunkOrder = 1,
+                numberOfOngoingRequests = 0;
 
             let aPromise = [];
 
-            while (startReading < fileSize) {
+            function WhileLoop(callback) {
+                (function CodeBlock() {
+                    if (startReading < fileSize) {
+                        if (numberOfOngoingRequests < self.CONCURRENT_REQUESTS) {
+                            var chunk = file.slice(startReading, endReading);
+
+                            var oPromise = chunkUploadPromise(chunk, chunkOrder, oFileHelper.token);
+
+                            numberOfOngoingRequests++;
+                            aPromise.push(oPromise);
+
+                            oPromise
+                                .then(function (res) {
+                                    numberOfOngoingRequests--;
+                                    chunksCompleted++;
+                                    self.onUploadProgress(oFileHelper, chunksCompleted / numberOfChunks);
+                                });
+
+                            startReading = endReading;
+                            endReading = startReading + self.BYTES_PER_CHUNK;
+                            chunkOrder++;
+                        }
+
+                        setTimeout(CodeBlock, 0);
+                        //CodeBlock();
+                    }
+                    else {
+                        callback();
+                    }
+                })();
+            };
+
+            function AfterWhileLoop() {
+                self.windowReference.Promise.all(aPromise)
+                    .then(function (res) {
+                        resolve(oFileHelper);
+                    })
+                    .catch(function (err) {
+                        reject(err, oFileHelper);
+                    });
+            };
+
+            WhileLoop(AfterWhileLoop);
+
+            /*while (startReading < fileSize) {
                 var chunk = file.slice(startReading, endReading);
 
                 var oPromise = chunkUploadPromise(chunk, chunkOrder, oFileHelper.token);
@@ -87,7 +111,7 @@ const myJs = (function () {
                 })
                 .catch(function (err) {
                     reject(err, oFileHelper);
-                });
+                });*/
         });
     };
 
@@ -114,7 +138,9 @@ const myJs = (function () {
 
     function FileUploader(aFile, sParentFolderId, iBytesPerChunk) {
         this.windowReference = window;
-        this.BYTES_PER_CHUNK = iBytesPerChunk || 77570;
+        //this.BYTES_PER_CHUNK = iBytesPerChunk || 77570; // 77,57 KB
+        this.BYTES_PER_CHUNK = iBytesPerChunk || 1000000; // 1 MB
+        this.CONCURRENT_REQUESTS = 4;
         this.files = [];
         for (var i = 0, length = aFile.length; i < length; i++) {
             this.files.push(new FileHelper(aFile[i], sParentFolderId));

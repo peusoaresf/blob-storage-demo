@@ -23,32 +23,28 @@ namespace WebUI.Ajax.File
             string token = Request.Params["token"];
             string fileName = Request.Params["fileName"];
 
-            Arquivo arquivoReferencia = await CriarReferenciaArquivo(fileName);
+            Arquivo arquivoReferencia = await CriarReferenciaArquivoAsync(fileName);
 
-            FileManager fileManager = FileManagerFactory.Create();
+            IFileManager fileManager = FileManagerFactory.Create();
 
-            long fileSize = await fileManager.MergeChunks(arquivoReferencia.Url, token);
+            long fileSize = await fileManager.MergeChunksAsync(arquivoReferencia.Url, token);
 
             arquivoReferencia.Tamanho = fileSize;
-            await _arquivoRepository.Update(arquivoReferencia);
+            await _arquivoRepository.UpdateAsync(arquivoReferencia);
 
             Response.Write(fileSize);
             Response.End();
         }
 
-        private async Task<Arquivo> CriarReferenciaArquivo(string nomeArquivo)
+        private async Task<Arquivo> CriarReferenciaArquivoAsync(string nomeArquivo)
         {
             long idDiretorio = Convert.ToInt64(Request.Params["parentFolderId"]);
 
-            Arquivo parent = await _arquivoRepository.FindById(idDiretorio);
+            Arquivo parent = await _arquivoRepository.FindByIdAsync(idDiretorio);
 
-            Arquivo novoArquivo = ArquivoFactory.Create();
-            novoArquivo.IsDiretorio = false;
-            novoArquivo.Nome = nomeArquivo;
-            novoArquivo.Url = $"{parent.Url}{nomeArquivo}";
-            novoArquivo.Parent = parent;
+            Arquivo novoArquivo = ArquivoFactory.Create(nomeArquivo, false, parent);
 
-            await _arquivoRepository.Add(novoArquivo);
+            await _arquivoRepository.AddAsync(novoArquivo);
 
             return novoArquivo;
         }

@@ -11,39 +11,23 @@ namespace WebUI.Classes
     {
         private static long _identity = 1;
 
-        private static Arquivo root = new Arquivo()
+        private static Arquivo _root = new Arquivo("GED_local", true, null)
         {
-            IdArquivo = _identity,
-            Nome = "GED_local",
-            Url = "",
             DataCriacao = new DateTime(2019, 2, 7),
-            IsDiretorio = true,
-            Parent = null
+            IdArquivo = _identity
         };
 
         private static Dictionary<long, Arquivo> _arquivos = new Dictionary<long, Arquivo>()
         {
             {
-                root.IdArquivo,
-                root
-            }/*,
-            {
-                2,
-                new Arquivo()
-                {
-                    IdArquivo = 2,
-                    Nome = "antigo painel de conexão.txt",
-                    Url = "/antigo painel de conexão.txt",
-                    DataCriacao = new DateTime(2019, 2, 8),
-                    IsDiretorio = false,
-                    Parent = root
-                }
-            }*/
+                _root.IdArquivo,
+                _root
+            }
         };
 
-        public async Task Add(Arquivo arquivo)
+        public async Task AddAsync(Arquivo arquivo)
         {
-            await Sleep();
+            await SleepAsync();
 
             long id = ++_identity;
             var now = DateTime.Now;            
@@ -54,37 +38,37 @@ namespace WebUI.Classes
             _arquivos.Add(id, arquivo);
         }
 
-        public async Task Update(Arquivo arquivo)
+        public async Task UpdateAsync(Arquivo arquivo)
         {
-            await Sleep();
+            await SleepAsync();
 
             _arquivos[arquivo.IdArquivo] = arquivo;
         }
 
-        public async Task Delete(long id)
+        public async Task DeleteAsync(long id)
         {
-            await Sleep();
+            await SleepAsync();
 
             _arquivos.Remove(id);
         }
 
-        public async Task<IEnumerable<Arquivo>> FindAll()
+        public async Task<IEnumerable<Arquivo>> FindAllAsync()
         {
-            await Sleep();
+            await SleepAsync();
 
             return _arquivos.Values.OrderBy(x => !x.IsDiretorio);
         }
 
-        public async Task<Arquivo> FindById(long id)
+        public async Task<Arquivo> FindByIdAsync(long id)
         {
-            await Sleep();
+            await SleepAsync();
 
             return _arquivos[id];
         }
 
-        public async Task<Arquivo> FindWhereParentIsNull()
+        public async Task<Arquivo> FindWhereParentIsNullAsync()
         {
-            IEnumerable<Arquivo> arquivos = await FindAll();
+            IEnumerable<Arquivo> arquivos = await FindAllAsync();
 
             foreach (var arquivo in arquivos)
             {
@@ -97,9 +81,9 @@ namespace WebUI.Classes
             return null;
         }
 
-        public async Task<IEnumerable<Arquivo>> FindWhereParentEquals(long id)
+        public async Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long id)
         {
-            IEnumerable<Arquivo> arquivos = await FindAll();
+            IEnumerable<Arquivo> arquivos = await FindAllAsync();
 
             var result = new List<Arquivo>();
 
@@ -114,11 +98,11 @@ namespace WebUI.Classes
             return result.OrderBy(x => !x.IsDiretorio);
         }
 
-        private async Task Sleep()
+        private async Task SleepAsync()
         {
             await Task.Run(() =>
             {
-                Thread.Sleep(10);
+                Thread.Sleep(5);
             });
         }
     }

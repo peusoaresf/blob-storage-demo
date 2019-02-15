@@ -7,9 +7,9 @@ namespace WebUI.Classes
 {
     public class FileManagerFactory
     {
-        public static FileManager Create()
+        public static IFileManager Create()
         {
-            return new FileManager();
+            return new LocalFileManager();
         }
     }
 }

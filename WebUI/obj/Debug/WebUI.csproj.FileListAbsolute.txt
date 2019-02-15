@@ -36,3 +36,13 @@ C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.xml
 C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.pdb
 C:\Repositorio\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.xml
 C:\Repositorio\BlobStorageDemo\WebUI\bin\Newtonsoft.Json.xml
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.KeyVault.Core.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Newtonsoft.Json.dll
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.KeyVault.Core.xml
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.pdb
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Blob.xml
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.pdb
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Microsoft.Azure.Storage.Common.xml
+C:\Users\peuso\source\repos\BlobStorageDemo\WebUI\bin\Newtonsoft.Json.xml

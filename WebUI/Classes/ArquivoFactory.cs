@@ -7,9 +7,9 @@ namespace WebUI.Classes
 {
     public class ArquivoFactory
     {
-        public static Arquivo Create()
+        public static Arquivo Create(string nome, bool isDiretorio, Arquivo parent)
         {
-            return new Arquivo();
+            return new Arquivo(nome, isDiretorio, parent);
         }
     }
 }

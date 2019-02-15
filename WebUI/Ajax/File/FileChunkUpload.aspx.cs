@@ -17,9 +17,9 @@ namespace WebUI.Ajax.File
             string token = Request.Params["token"];
             HttpPostedFile httpPostedFile = Request.Files["chunk"];
 
-            FileManager fileManager = FileManagerFactory.Create();
+            IFileManager fileManager = FileManagerFactory.Create();
 
-            long fileSize = await fileManager.UploadChunk(httpPostedFile.InputStream, token);
+            long fileSize = await fileManager.UploadChunkAsync(httpPostedFile.InputStream, token);
 
             Response.Write(fileSize);
             Response.End();

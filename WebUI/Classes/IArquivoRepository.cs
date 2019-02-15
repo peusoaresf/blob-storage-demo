@@ -5,12 +5,12 @@ namespace WebUI.Classes
 {
     public interface IArquivoRepository
     {
-        Task Add(Arquivo arquivo);
-        Task Delete(long id);
-        Task<IEnumerable<Arquivo>> FindAll();
-        Task<Arquivo> FindById(long id);
-        Task<IEnumerable<Arquivo>> FindWhereParentEquals(long id);
-        Task<Arquivo> FindWhereParentIsNull();
-        Task Update(Arquivo arquivo);
+        Task AddAsync(Arquivo arquivo);
+        Task DeleteAsync(long id);
+        Task<IEnumerable<Arquivo>> FindAllAsync();
+        Task<Arquivo> FindByIdAsync(long id);
+        Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long id);
+        Task<Arquivo> FindWhereParentIsNullAsync();
+        Task UpdateAsync(Arquivo arquivo);
     }
 }

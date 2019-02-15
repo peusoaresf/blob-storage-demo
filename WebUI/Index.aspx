@@ -25,7 +25,7 @@
             <legend>Criar Diretório</legend>
             <input type="text" id="InputNomeDiretorio" runat="server" />
             <button type="button" id="btnCriarDiretorio">Criar</button>
-            <asp:Button OnClick="CriarDiretorio_Click" ID="btnCriarDiretorioSrv" style="display:none" runat="server" />
+            <asp:Button OnClick="CriarDiretorioAsync_Click" ID="btnCriarDiretorioSrv" style="display:none" runat="server" />
         </fieldset>
 
         <fieldset class="caixa">
@@ -48,7 +48,7 @@
             <input type="hidden" id="InputIdArquivoSelecionado" runat="server" />
 
             <div runat="server" id="ContainerTabela"></div>
-            <asp:Button OnClick="ExcluirDiretorio_Click" ID="btnExcluirDiretorioSrv" style="display:none" runat="server" />
+            <asp:Button OnClick="ExcluirDiretorioAsync_Click" ID="btnExcluirDiretorioSrv" style="display:none" runat="server" />
         </fieldset>
     </form>
     

@@ -128,9 +128,11 @@
     </Compile>
     <Compile Include="Classes\Arquivo.cs" />
     <Compile Include="Classes\ArquivoFactory.cs" />
+    <Compile Include="Classes\AzureBlobStorageFileManager.cs" />
+    <Compile Include="Classes\IFileManager.cs" />
     <Compile Include="Classes\MemoryArquivoRepository.cs" />
     <Compile Include="Classes\ArquivoRepositoryFactory.cs" />
-    <Compile Include="Classes\FileManager.cs" />
+    <Compile Include="Classes\LocalFileManager.cs" />
     <Compile Include="Classes\FileManagerFactory.cs" />
     <Compile Include="Classes\IArquivoRepository.cs" />
     <Compile Include="Index.aspx.cs">

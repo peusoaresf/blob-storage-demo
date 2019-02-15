@@ -23,27 +23,27 @@ namespace WebUI.Ajax.File
             {
                 Response.Clear();
                 
-                string json = await HandleFileDownload();
+                string json = await HandleFileDownloadAsync();
 
                 Response.Write(json);
                 Response.End();
             }
         }
 
-        private async Task<string> HandleFileDownload()
+        private async Task<string> HandleFileDownloadAsync()
         {
-            Arquivo arquivo = await PegarArquivoRequest();
+            Arquivo arquivo = await PegarArquivoRequestAsync();
 
-            FileManager fileManager = FileManagerFactory.Create();
+            IFileManager fileManager = FileManagerFactory.Create();
 
-            return await fileManager.Download(arquivo);
+            return await fileManager.DownloadAsync(arquivo);
         }
 
-        private async Task<Arquivo> PegarArquivoRequest()
+        private async Task<Arquivo> PegarArquivoRequestAsync()
         {
             long idArquivo = Convert.ToInt64(Request.Params["idArquivo"]);
 
-            return await _arquivoRepository.FindById(idArquivo);
+            return await _arquivoRepository.FindByIdAsync(idArquivo);
         }        
     }
 }
