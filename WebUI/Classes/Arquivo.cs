@@ -15,6 +15,8 @@ namespace WebUI.Classes
         public Arquivo Parent { get; set; }
         public DateTime DataCriacao { get; set; }
 
+        public Arquivo() { }
+
         public Arquivo(string nome, bool isDiretorio, Arquivo parent)
         {
             this.Nome = nome;

@@ -135,6 +135,7 @@
     <Compile Include="Classes\LocalFileManager.cs" />
     <Compile Include="Classes\FileManagerFactory.cs" />
     <Compile Include="Classes\IArquivoRepository.cs" />
+    <Compile Include="Classes\SqlServerArquivoRepository.cs" />
     <Compile Include="Index.aspx.cs">
       <DependentUpon>Index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
