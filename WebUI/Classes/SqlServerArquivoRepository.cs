@@ -74,7 +74,12 @@ namespace WebUI.Classes
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long id)
+        public Task<IEnumerable<Arquivo>> FindWhereParentAndNameEqualsAsync(long? id, string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long? id)
         {
             throw new NotImplementedException();
         }

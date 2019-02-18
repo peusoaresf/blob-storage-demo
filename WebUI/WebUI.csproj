@@ -89,15 +89,41 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ajax\File\Api\FileDELETE.aspx" />
+    <Content Include="Ajax\File\Api\FileGET.aspx" />
+    <Content Include="Ajax\File\Api\FilePOST.aspx" />
     <Content Include="Ajax\File\FileChunkMerge.aspx" />
     <Content Include="Ajax\File\FileChunkUpload.aspx" />
     <Content Include="Ajax\File\FileDownload.aspx" />
     <Content Include="Ajax\File\FileUpload.aspx" />
     <Content Include="FileUploader.js" />
     <Content Include="Index.aspx" />
+    <Content Include="Index.html" />
+    <Content Include="site.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ajax\File\Api\FileDELETE.aspx.cs">
+      <DependentUpon>FileDELETE.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Ajax\File\Api\FileDELETE.aspx.designer.cs">
+      <DependentUpon>FileDELETE.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Ajax\File\Api\FileGET.aspx.cs">
+      <DependentUpon>FileGET.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Ajax\File\Api\FileGET.aspx.designer.cs">
+      <DependentUpon>FileGET.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Ajax\File\Api\FilePOST.aspx.cs">
+      <DependentUpon>FilePOST.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Ajax\File\Api\FilePOST.aspx.designer.cs">
+      <DependentUpon>FilePOST.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Ajax\File\FileChunkMerge.aspx.cs">
       <DependentUpon>FileChunkMerge.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -128,6 +154,7 @@
     </Compile>
     <Compile Include="Classes\Arquivo.cs" />
     <Compile Include="Classes\ArquivoFactory.cs" />
+    <Compile Include="Classes\ArquivoRules.cs" />
     <Compile Include="Classes\AzureBlobStorageFileManager.cs" />
     <Compile Include="Classes\IFileManager.cs" />
     <Compile Include="Classes\MemoryArquivoRepository.cs" />

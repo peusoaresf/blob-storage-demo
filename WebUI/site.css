@@ -1,0 +1,8 @@
+﻿.caixa {
+    width: fit-content;
+    display: inline-block;
+}
+
+.cabecalho {
+    text-align: left;
+}

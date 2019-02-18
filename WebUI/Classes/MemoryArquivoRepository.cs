@@ -81,17 +81,41 @@ namespace WebUI.Classes
             return null;
         }
 
-        public async Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long id)
+        public async Task<IEnumerable<Arquivo>> FindWhereParentAndNameEqualsAsync(long? idParent, string nome)
+        {
+            IEnumerable<Arquivo> arquivos = await FindWhereParentEqualsAsync(idParent);
+
+            var result = new List<Arquivo>();
+            
+            foreach (var arquivo in arquivos)
+            {
+                if (arquivo.Nome == nome)
+                {
+                    result.Add(arquivo);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<Arquivo>> FindWhereParentEqualsAsync(long? id)
         {
             IEnumerable<Arquivo> arquivos = await FindAllAsync();
 
             var result = new List<Arquivo>();
 
-            foreach (var arquivo in arquivos)
+            if (id == null)
             {
-                if (arquivo.Parent != null && arquivo.Parent.IdArquivo == id)
+                result.Add(await FindWhereParentIsNullAsync());
+            }
+            else
+            {
+                foreach (var arquivo in arquivos)
                 {
-                    result.Add(arquivo);
+                    if (arquivo.Parent != null && arquivo.Parent.IdArquivo == id)
+                    {
+                        result.Add(arquivo);
+                    }
                 }
             }
 

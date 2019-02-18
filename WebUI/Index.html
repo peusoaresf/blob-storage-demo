@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Pernil Drive</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="site.css" />
+</head>
+<body class="p-2">
+    <div class="caixa">
+        <fieldset class="caixa border p-2">
+            <legend style="width: auto">Criar Diretório</legend>
+            <input class="form-control" style="display:initial!important;width:initial;" data-bind="value: nomeNovoDiretorio" />
+            <button class="btn" data-bind="click: onCriarDiretorio">Criar</button>
+        </fieldset>
+
+        <fieldset class="caixa border p-2">
+            <legend style="width: auto">Adicionar Arquivo ao Diretório</legend>
+            <input type="file" multiple="multiple" data-bind="event: { change: onArquivoSelecionado }" id="inputFile" />
+            <button class="btn" data-bind="click: onEnviarArquivo">Enviar</button>
+        </fieldset>
+
+        <br />
+        <br />
+
+        <p data-bind="text: mensagemErro"></p>
+        <div data-bind="html: containerProgresso"></div>
+
+        <hr />
+
+        <fieldset class="caixa border p-2">
+            <legend style="width: auto" data-bind="html: breadCrumbDiretorio"></legend>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class='cabecalho' style='width: 280px'>Nome</th>
+                        <th class='cabecalho' style='width: 180px'>Tamanho</th>
+                        <th class='cabecalho' style='width: 190px'>Data Criação</th>
+                        <th class='cabecalho' style='width: 60px'></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: arquivosNoDiretorio">
+                    <tr>
+                        <td>
+                            <i class='material-icons' data-bind="text: IsDiretorio ? 'folder' : 'insert_drive_file'"></i>
+                            <a data-bind="attr: {
+                            href: '#',
+                            title: IsDiretorio ? 'Navegar para o diretório' : 'Baixar arquivo'
+                        },
+                        click: IsDiretorio ? $root.onAbrirDiretorio : $root.onBaixarArquivo">
+                                <span data-bind="text: Nome"></span>
+                            </a>
+                        </td>
+                        <td data-bind="text: Tamanho"></td>
+                        <td data-bind="text: DataCriacao"></td>
+                        <td>
+                            <button class="btn" data-bind="click: $root.onExcluirArquivo">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot data-bind="visible: arquivosNoDiretorio().length === 0">
+                    <tr>
+                        <td>Diretório vazio</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </fieldset>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script src="FileUploader.js"></script>
+    <script>
+        var viewModel = new IndexViewModel();
+
+        ko.applyBindings(viewModel);
+
+        function notificarErro(err) {
+            var msg = err.status + " - " + err.statusText;
+            if (err.responseText) {
+                msg += "\n" + JSON.parse(err.responseText).error.message;
+            }
+            alert(msg);
+        }
+
+        function pListarArquivo(idParent) {
+            return $.ajax("Ajax/File/Api/FileGET.aspx", {
+                type: "GET",
+                dataType: "json",
+                data: {
+                    fkParent: idParent
+                }
+            });
+        }
+
+        function isNomeDiretorioValido(sNome) {
+            var bValido = true;
+
+            $("td:first span", "table tbody tr").each(function (el) {
+                if ($(this).text() === sNome) {
+                    bValido = false;
+                    return;
+                }
+            });
+
+            return bValido;
+        }
+
+        function salvarArquivo(sNome, sTipo, aDataArray) {
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style = "display: none";
+            var blob = new Blob([new Uint8Array(aDataArray)], {
+                type: sTipo
+            });
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = sNome;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+
+        function IndexViewModel() {
+            var self = this;
+
+            self.containerProgresso = ko.observable("");
+            self.mensagemErro = ko.observable();
+            self.diretorioCorrente = ko.observable();
+            self.breadCrumbDiretorio = ko.observable();
+            self.nomeNovoDiretorio = ko.observable();            
+            self.arquivoSelecionado = ko.observableArray();
+            self.arquivosNoDiretorio = ko.observableArray();
+
+            self.montarBreadCrumb = function (oDiretorioCorrente) {
+                var aux = oDiretorioCorrente,
+                    html = "<span>\\" + aux.Nome + "</span>";
+
+                aux = oDiretorioCorrente.Parent;
+
+                while (aux != null) {
+                    html = "\\<a href='#' onclick='viewModel.onAbrirDiretorio(null, null," + JSON.stringify(aux) + ")'>" + aux.Nome + "</a>" + html;
+                    aux = aux.Parent;
+                }
+
+                self.breadCrumbDiretorio(html);
+            }
+
+            self.onArquivoSelecionado = function (vm, evt) {
+                self.arquivoSelecionado().length = 0;
+                ko.utils.arrayForEach(evt.target.files, function (file) {
+                    self.arquivoSelecionado.push(file);
+                });
+            }
+
+            self.onCriarDiretorio = function () {
+                var sNomeNovoDiretorio = self.nomeNovoDiretorio();
+
+                if (!sNomeNovoDiretorio) {
+                    alert("insira o nome do diretório");
+                }
+                else if (!isNomeDiretorioValido(sNomeNovoDiretorio)) {
+                    alert("O nome do diretório não pode ser repetido dentro desta pasta");
+                }
+                else {
+                    $.ajax("Ajax/File/Api/FilePOST.aspx", {
+                        type: "POST",
+                        data: {
+                            Nome: sNomeNovoDiretorio,
+                            IsDiretorio: true,
+                            FkParent: self.diretorioCorrente().IdArquivo
+                        },
+                        dataType: "json",
+                        success: function (res) {
+                            pListarArquivo(self.diretorioCorrente().IdArquivo)
+                                .then(function (res) {
+                                    self.arquivosNoDiretorio(res.result);
+                                    self.nomeNovoDiretorio("");
+                                })
+                                .catch(function (err) {
+                                    notificarErro(err);
+                                });
+                        },
+                        error: function (err) {
+                            notificarErro(err);
+                        }
+                    });
+                }
+            }
+
+            self.onEnviarArquivo = function (el, evt) {
+                var aArquivo = self.arquivoSelecionado();
+
+                if (aArquivo.length) {
+                    var fileUploader = new myJs.FileUploader(aArquivo, self.diretorioCorrente().IdArquivo);
+
+                    let contador = 0;
+
+                    fileUploader.onUploadStarted = function (oFileHelper) {
+                        oFileHelper.idProgresso = "#progressoUpload" + contador;
+                        self.containerProgresso(
+                            '<p>' + oFileHelper.file.name + ':'
+                            + '<span style="left-margin: 10px" id="progressoUpload' + contador + '">0</span>'
+                            + '</p>'
+                            + self.containerProgresso());
+                        contador++;
+                    };
+
+                    fileUploader.onUploadProgress = function (oFileHelper, progress) {
+                        $(oFileHelper.idProgresso).text((progress * 100).toFixed(2) + "%");
+                    };
+
+                    fileUploader.onUploadFinishing = function (oFileHelper) {
+                        $(oFileHelper.idProgresso).text("Finalizando upload....");
+                    };
+
+                    fileUploader.onUploadFinished = function (oFileHelper) {
+                        $(oFileHelper.idProgresso).text("Upload concluído com sucesso.");
+                    };
+
+                    fileUploader.onUploadError = function (oFileHelper) {
+                        $(oFileHelper.idProgresso).text("Erro no upload. Tente novamente.");
+                    };
+
+                    fileUploader.onAllUploadFinished = function () {
+                        alert("todos uploads concluídos");
+
+                        pListarArquivo(self.diretorioCorrente().IdArquivo)
+                            .then(function (res) {
+                                self.arquivosNoDiretorio(res.result);
+                                self.containerProgresso("");
+                                $("#inputFile").val("");
+                            })
+                            .catch(function (err) {
+                                notificarErro(err);
+                            });
+                    };
+
+                    fileUploader.start();
+                }
+                else {
+                    alert("Nenhum arquivo selecionado");
+                }
+            }
+
+            self.onAbrirDiretorio = function (el, ev, jsonArquivo) {
+                var oDiretorio = jsonArquivo || this;
+
+                pListarArquivo(oDiretorio.IdArquivo)
+                    .then(function (res) {
+                        self.diretorioCorrente(oDiretorio);
+                        self.arquivosNoDiretorio(res.result);
+                        self.montarBreadCrumb(oDiretorio);
+                    })
+                    .catch(function (err) {
+                        notificarErro(err);
+                    });
+            }
+
+            self.onBaixarArquivo = function () {
+                $.ajax({
+                    type: "GET",
+                    url: "Ajax/File/FileDownload.aspx",
+                    data: {
+                        idArquivo: this.IdArquivo
+                    },
+                    dataType: "json",
+                    success: function (res) {
+                        salvarArquivo(res.NomeArquivo, res.MimeType, res.Buffer);
+                    }
+                });
+            }
+
+            self.onExcluirArquivo = function () {
+                var id = this.IdArquivo;
+
+                $.ajax("Ajax/File/Api/FileDELETE.aspx", {
+                    type: "POST",
+                    data: {
+                        id: id
+                    },
+                    success: function (res) {
+                        self.arquivosNoDiretorio.remove(function (item) {
+                            return item.IdArquivo === id;
+                        });
+                    },
+                    error: function (err) {
+                        notificarErro(err);
+                    }
+                });
+            }
+
+            pListarArquivo(null)
+                .then(function (res) {
+                    self.diretorioCorrente(res.result[0]);
+                    self.breadCrumbDiretorio(res.result[0].Nome);
+
+                    return pListarArquivo(res.result[0].IdArquivo);
+                })
+                .then(function (res) {
+                    self.arquivosNoDiretorio(res.result);
+                })
+                .catch(function (err) {
+                    notificarErro(err);
+                });
+        }
+    </script>
+</body>
+</html>
