@@ -25,7 +25,7 @@
         <br />
 
         <p data-bind="text: mensagemErro"></p>
-        <div data-bind="html: containerProgresso"></div>
+        <div id="containerProgresso"></div>
 
         <hr />
 
@@ -46,10 +46,10 @@
                         <td>
                             <i class='material-icons' data-bind="text: IsDiretorio ? 'folder' : 'insert_drive_file'"></i>
                             <a data-bind="attr: {
-                            href: '#',
-                            title: IsDiretorio ? 'Navegar para o diretório' : 'Baixar arquivo'
-                        },
-                        click: IsDiretorio ? $root.onAbrirDiretorio : $root.onBaixarArquivo">
+                                href: '#',
+                                title: IsDiretorio ? 'Navegar para o diretório' : 'Baixar arquivo'
+                            },
+                            click: IsDiretorio ? $root.onAbrirDiretorio : $root.onBaixarArquivo">
                                 <span data-bind="text: Nome"></span>
                             </a>
                         </td>
@@ -122,10 +122,9 @@
             window.URL.revokeObjectURL(url);
         };
 
-        function IndexViewModel() {
+        function IndexViewModel(s) {
             var self = this;
-
-            self.containerProgresso = ko.observable("");
+            
             self.mensagemErro = ko.observable();
             self.diretorioCorrente = ko.observable();
             self.breadCrumbDiretorio = ko.observable();
@@ -189,21 +188,21 @@
                 }
             }
 
+            var contador = 0;
+
             self.onEnviarArquivo = function (el, evt) {
                 var aArquivo = self.arquivoSelecionado();
 
                 if (aArquivo.length) {
                     var fileUploader = new myJs.FileUploader(aArquivo, self.diretorioCorrente().IdArquivo);
-
-                    let contador = 0;
-
+                    
                     fileUploader.onUploadStarted = function (oFileHelper) {
                         oFileHelper.idProgresso = "#progressoUpload" + contador;
-                        self.containerProgresso(
-                            '<p>' + oFileHelper.file.name + ':'
-                            + '<span style="left-margin: 10px" id="progressoUpload' + contador + '">0</span>'
-                            + '</p>'
-                            + self.containerProgresso());
+                        $("#containerProgresso").append(
+                            '<p id="pProgresso' + contador + '">' + oFileHelper.file.name + ':'
+                            + '<span style="margin-left: 10px" id="progressoUpload' + contador + '">0</span>'
+                            + '<i style="cursor: pointer" class="material-icons" onclick="$(\'#pProgresso' + contador + '\').remove();">close</i>'
+                            + '</p>');
                         contador++;
                     };
 
@@ -217,26 +216,23 @@
 
                     fileUploader.onUploadFinished = function (oFileHelper) {
                         $(oFileHelper.idProgresso).text("Upload concluído com sucesso.");
+
+                        if (self.diretorioCorrente().IdArquivo === oFileHelper.parentFolderId) {
+                            pListarArquivo(self.diretorioCorrente().IdArquivo)
+                                .then(function (res) {
+                                    self.arquivosNoDiretorio(res.result);
+                                })
+                                .catch(function (err) {
+                                    notificarErro(err);
+                                });
+                        }
                     };
 
                     fileUploader.onUploadError = function (oFileHelper) {
                         $(oFileHelper.idProgresso).text("Erro no upload. Tente novamente.");
                     };
 
-                    fileUploader.onAllUploadFinished = function () {
-                        alert("todos uploads concluídos");
-
-                        pListarArquivo(self.diretorioCorrente().IdArquivo)
-                            .then(function (res) {
-                                self.arquivosNoDiretorio(res.result);
-                                self.containerProgresso("");
-                                $("#inputFile").val("");
-                            })
-                            .catch(function (err) {
-                                notificarErro(err);
-                            });
-                    };
-
+                    $("#inputFile").val("");
                     fileUploader.start();
                 }
                 else {

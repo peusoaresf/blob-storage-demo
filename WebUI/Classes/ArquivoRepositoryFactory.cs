@@ -9,7 +9,7 @@ namespace WebUI.Classes
     {
         public static IArquivoRepository Create()
         {
-            return new MemoryArquivoRepository();
+            return new SqlServerArquivoRepository();
         }
     }
 }

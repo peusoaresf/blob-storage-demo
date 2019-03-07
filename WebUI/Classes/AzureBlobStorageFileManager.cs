@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,19 +43,42 @@ namespace WebUI.Classes
             IEnumerable<string> chunksBlobs = OrdenarChunksBlobs(GetChunksBlobs(container, fileToken));
 
             CloudBlockBlob novoBlob = container.GetBlockBlobReference(fileUrl);
-            
+
+            int contador = 1;
+
             using (Stream novoBlobStream = await novoBlob.OpenWriteAsync())
             {
                 foreach (var chunk in chunksBlobs)
                 {
                     CloudBlockBlob chunkBlob = container.GetBlockBlobReference(chunk);
-
+                    
                     using (Stream chunkStream = await chunkBlob.OpenReadAsync())
                     {
-                        byte[] chunkStreamContent = new byte[chunkStream.Length];
+                        using (SqlConnection sqlConnection = new SqlConnection("Data Source=TENTIRJD0155;Initial Catalog=blobstoragedemodb;User ID=restuser;Password=123456"))
+                        {
+                            await sqlConnection.OpenAsync();
 
-                        chunkStream.Read(chunkStreamContent, 0, (int) chunkStream.Length);
-                        novoBlobStream.Write(chunkStreamContent, 0, (int) chunkStream.Length);
+                            SqlCommand sqlCommand = sqlConnection.CreateCommand();
+
+                            sqlCommand.CommandText = "insert into Aux(arquivo, contador) values('" + novoBlob.Name + "', " + contador + ")";
+                            contador++;
+
+                            await sqlCommand.ExecuteNonQueryAsync();
+                        }
+
+                        byte[] chunkStreamContent = new byte[chunkStream.Length];
+                        
+                        await chunkStream.ReadAsync(chunkStreamContent, 0, Convert.ToInt32(chunkStream.Length));
+                        
+                        Task t = novoBlobStream.WriteAsync(chunkStreamContent, 0, Convert.ToInt32(chunkStream.Length));
+
+                        if (await Task.WhenAny(t, Task.Delay(50000)) != t)
+                        {
+                            // Se passado um tempo de 50 segundos e a escrita intermediaria no arquivo destino ainda não foi finalizada,
+                            // é preciso lançar um erro e reiniciar o processamento do arquivo. Não é possível determinar se a execução anterior foi finalizada e 
+                            // o quanto foi escrito na stream destino
+                            throw new Exception("Merge Timeout - Reiniciar o processamento do arquivo");
+                        }
                     }
                 }
             }

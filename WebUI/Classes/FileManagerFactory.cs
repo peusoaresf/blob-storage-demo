@@ -9,7 +9,7 @@ namespace WebUI.Classes
     {
         public static IFileManager Create()
         {
-            return new LocalFileManager();
+            return new AzureBlobStorageFileManager();
         }
     }
 }
