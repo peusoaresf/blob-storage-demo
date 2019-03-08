@@ -42,7 +42,7 @@ namespace WebUI.Classes
 
             CloudBlockBlob novoBlob = container.GetBlockBlobReference(fileUrl);
 
-            int contador = 1;
+            //int contador = 1;
 
             using (Stream novoBlobStream = await novoBlob.OpenWriteAsync())
             {
@@ -52,7 +52,7 @@ namespace WebUI.Classes
                     
                     using (Stream chunkStream = await chunkBlob.OpenReadAsync())
                     {
-                        using (SqlConnection sqlConnection = new SqlConnection("Data Source=TENTIRJD0155;Initial Catalog=blobstoragedemodb;User ID=restuser;Password=123456"))
+                        /*using (SqlConnection sqlConnection = new SqlConnection("Data Source=TENTIRJD0155;Initial Catalog=blobstoragedemodb;User ID=restuser;Password=123456"))
                         {
                             await sqlConnection.OpenAsync();
 
@@ -62,7 +62,7 @@ namespace WebUI.Classes
                             contador++;
 
                             await sqlCommand.ExecuteNonQueryAsync();
-                        }
+                        }*/
 
                         byte[] chunkStreamContent = new byte[chunkStream.Length];
                         

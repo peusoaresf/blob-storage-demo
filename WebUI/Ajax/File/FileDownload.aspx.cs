@@ -29,6 +29,7 @@ namespace WebUI.Ajax.File
 
                 using (Stream fileStream = await fileManager.GetStream(arquivo))
                 {
+                    Response.BufferOutput = false;
                     Response.AddHeader("Content-Disposition", "attachment; filename=" + arquivo.Nome);
                     Response.AddHeader("Content-Length", fileStream.Length.ToString());
                     Response.ContentType = String.IsNullOrWhiteSpace(arquivo.MimeType) ? "application/octet-stream" : arquivo.MimeType;
