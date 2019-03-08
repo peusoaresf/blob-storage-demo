@@ -11,8 +11,7 @@ namespace WebUI.Classes
 {
     public class LocalFileManager : IFileManager
     {
-        //private static string _baseUrl = "C:\\dev\\ged_repo\\"; // Thinkpad
-        private static string _baseUrl = "C:\\GED_local\\"; // Tenti
+        private static string _baseUrl = HttpContext.Current.Server.MapPath("~") + "upload\\ged\\";
 
         public async Task<string> DeleteAsync(Arquivo arquivo)
         {
