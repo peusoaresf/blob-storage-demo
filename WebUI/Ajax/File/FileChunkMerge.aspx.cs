@@ -20,11 +20,12 @@ namespace WebUI.Ajax.File
 
             Response.Clear();
 
+            long idDiretorio = Convert.ToInt64(Request.Params["parentFolderId"]);
             string token = Request.Params["token"];
             string fileName = Request.Params["fileName"];
             string mimeType = Request.Params["mimeType"];
 
-            Arquivo arquivoReferencia = await CriarReferenciaArquivoAsync(fileName);
+            Arquivo arquivoReferencia = await ArquivoRules.AddAsync(fileName, false, idDiretorio);
 
             IFileManager fileManager = FileManagerFactory.Create();
 
@@ -37,19 +38,6 @@ namespace WebUI.Ajax.File
 
             Response.Write(fileSize);
             Response.End();
-        }
-
-        private async Task<Arquivo> CriarReferenciaArquivoAsync(string nomeArquivo)
-        {
-            long idDiretorio = Convert.ToInt64(Request.Params["parentFolderId"]);
-
-            Arquivo parent = await _arquivoRepository.FindByIdAsync(idDiretorio);
-
-            Arquivo novoArquivo = ArquivoFactory.Create(nomeArquivo, false, parent);
-
-            await _arquivoRepository.AddAsync(novoArquivo);
-
-            return novoArquivo;
         }
     }
 }

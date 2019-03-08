@@ -45,13 +45,12 @@ namespace WebUI.Ajax.File
         {
             long idDiretorio = Convert.ToInt64(Request.Params["idDiretorio"]);
 
-            Arquivo parent = await _arquivoRepository.FindByIdAsync(idDiretorio);
+            Arquivo novoArquivo = await ArquivoRules.AddAsync(arquivo.FileName, false, idDiretorio);
 
-            Arquivo novoArquivo = ArquivoFactory.Create(arquivo.FileName, false, parent);
             novoArquivo.Tamanho = arquivo.ContentLength;
             novoArquivo.MimeType = arquivo.ContentType;
 
-            await _arquivoRepository.AddAsync(novoArquivo);
+            await _arquivoRepository.UpdateAsync(novoArquivo);
 
             return novoArquivo.Url;
         }

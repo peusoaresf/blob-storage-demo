@@ -25,7 +25,7 @@ namespace WebUI.Classes
             }
         }
 
-        public async static Task AddAsync(string nome, bool isDiretorio, long fkParent)
+        public async static Task<Arquivo> AddAsync(string nome, bool isDiretorio, long fkParent)
         {
             IArquivoRepository arquivoRepository = ArquivoRepositoryFactory.Create();
 
@@ -37,11 +37,15 @@ namespace WebUI.Classes
                 }
             }         
 
+            // Adicionar verificação de versão para criar a referência com o versionamento correto
+
             Arquivo parent = await arquivoRepository.FindByIdAsync(fkParent);
 
             Arquivo arquivo = ArquivoFactory.Create(nome, isDiretorio, parent);
 
             await arquivoRepository.AddAsync(arquivo);
+
+            return arquivo;
         }
     }
 }
