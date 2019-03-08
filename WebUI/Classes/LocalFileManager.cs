@@ -26,13 +26,11 @@ namespace WebUI.Classes
             return "success";
         }
 
-        public async Task<string> DownloadAsync(Arquivo arquivo)
+        public async Task<Stream> GetStream(Arquivo arquivo)
         {
             await SleepAsync();
 
-            Stream stream = System.IO.File.Open(_baseUrl + arquivo.Url, FileMode.Open);
-
-            return PrepararJson(arquivo, stream);
+            return System.IO.File.Open(_baseUrl + arquivo.Url, FileMode.Open);
         }
 
         public async Task<long> MergeChunksAsync(string fileUrl, string fileToken)
@@ -90,29 +88,6 @@ namespace WebUI.Classes
         public async Task<long> UploadChunkAsync(Stream stream, string chunkToken)
         {
             return await UploadAsync(stream, $"tmp{chunkToken.Substring(chunkToken.IndexOf("-") + 1)}/{chunkToken}.tmp");
-        }
-
-        private string PrepararJson(Arquivo arquivo, Stream stream)
-        {
-            string json = String.Empty;
-
-            using (stream)
-            {
-                using (BinaryReader br = new BinaryReader(stream))
-                {
-                    var jss = new JavaScriptSerializer();
-                    jss.MaxJsonLength = Int32.MaxValue;
-
-                    json = jss.Serialize(new
-                    {
-                        NomeArquivo = arquivo.Nome,
-                        MimeType = MimeMapping.GetMimeMapping(arquivo.Nome),
-                        Buffer = br.ReadBytes((int) stream.Length)
-                    });
-                }
-            }
-
-            return json;
         }
 
         private async Task SleepAsync()

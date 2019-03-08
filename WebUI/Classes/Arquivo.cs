@@ -27,6 +27,7 @@ namespace WebUI.Classes
         public long Tamanho { get; set; }
         public string Nome { get; set; }
         public string Url { get; set; }
+        public string MimeType { get; set; }
         public long FkParent { get; set; }        
         public DateTime DataCriacao { get; set; }
 
@@ -38,8 +39,8 @@ namespace WebUI.Classes
             this.IsDiretorio = isDiretorio;
             this.Parent = parent;
             this.Url = parent != null
-                            ? $"{parent.Url}{nome}" + (isDiretorio ? "/" : String.Empty)
-                            : String.Empty;
+                        ? $"{parent.Url}{nome}" + (isDiretorio ? "/" : String.Empty)
+                        : String.Empty;
         }
     }
 }

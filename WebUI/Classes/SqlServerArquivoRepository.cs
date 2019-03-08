@@ -29,9 +29,10 @@ namespace WebUI.Classes
                     + "ind_diretorio, "
                     + "fk_parent, "
                     + "datahora_criacao, "
-                    + "tamanho) "
+                    + "tamanho, "
+                    + "mimetype)"
                     + "output INSERTED.id_arquivo "
-                    + "values(@param0, @param1, @param2, @param3, @param4, @param5)";
+                    + "values(@param0, @param1, @param2, @param3, @param4, @param5, @param6)";
                 
                 sqlCommand.Parameters.AddWithValue("@param0", arquivo.Nome);
                 sqlCommand.Parameters.AddWithValue("@param1", arquivo.Url);
@@ -39,6 +40,7 @@ namespace WebUI.Classes
                 sqlCommand.Parameters.AddWithValue("@param3", arquivo.FkParent);
                 sqlCommand.Parameters.AddWithValue("@param4", arquivo.DataCriacao);
                 sqlCommand.Parameters.AddWithValue("@param5", arquivo.Tamanho);
+                sqlCommand.Parameters.AddWithValue("@param6", arquivo.MimeType != null ? (object) arquivo.MimeType : DBNull.Value);
 
                 long generatedId = (long) await sqlCommand.ExecuteScalarAsync();
 
@@ -229,9 +231,10 @@ namespace WebUI.Classes
                     + "ind_diretorio = @param2, "
                     + "fk_parent = @param3, "
                     + "datahora_criacao = @param4, "
-                    + "tamanho = @param5 "
+                    + "tamanho = @param5, "
+                    + "mimetype = @param6 "
                     + "where "
-                    + "id_arquivo = @param6";
+                    + "id_arquivo = @param7";
 
                 sqlCommand.Parameters.AddWithValue("@param0", arquivo.Nome);
                 sqlCommand.Parameters.AddWithValue("@param1", arquivo.Url);
@@ -239,7 +242,8 @@ namespace WebUI.Classes
                 sqlCommand.Parameters.AddWithValue("@param3", arquivo.FkParent);
                 sqlCommand.Parameters.AddWithValue("@param4", arquivo.DataCriacao);
                 sqlCommand.Parameters.AddWithValue("@param5", arquivo.Tamanho);
-                sqlCommand.Parameters.AddWithValue("@param6", arquivo.IdArquivo);
+                sqlCommand.Parameters.AddWithValue("@param6", arquivo.MimeType != null ? (object) arquivo.MimeType : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@param7", arquivo.IdArquivo);
 
                 await sqlCommand.ExecuteNonQueryAsync();
             }
@@ -252,6 +256,7 @@ namespace WebUI.Classes
             long tamanho = Convert.ToInt64(dr["tamanho"]);
             string nome = dr["nome"].ToString();
             string url = dr["url"].ToString();
+            string mimetype = dr["mimetype"] != DBNull.Value ? dr["mimetype"].ToString() : String.Empty;
             DateTime dataCriacao = Convert.ToDateTime(dr["datahora_criacao"]);
             Arquivo parent = null;
 
@@ -266,6 +271,7 @@ namespace WebUI.Classes
             arquivo.Tamanho = tamanho;
             arquivo.Nome = nome;
             arquivo.Url = url;
+            arquivo.MimeType = mimetype;
             arquivo.DataCriacao = dataCriacao;
             arquivo.Parent = parent;
 

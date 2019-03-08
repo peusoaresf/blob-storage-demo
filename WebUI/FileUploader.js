@@ -119,6 +119,7 @@
         var formData = new FormData();
         formData.append("parentFolderId", oFileHelper.parentFolderId);
         formData.append("fileName", oFileHelper.file.name);
+        formData.append("mimeType", oFileHelper.file.type);
         formData.append("token", oFileHelper.token);
 
         return $.ajax({

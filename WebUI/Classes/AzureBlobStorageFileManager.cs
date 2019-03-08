@@ -26,14 +26,12 @@ namespace WebUI.Classes
             return "success";
         }
 
-        public async Task<string> DownloadAsync(Arquivo arquivo)
+        public async Task<Stream> GetStream(Arquivo arquivo)
         {
             CloudBlobContainer container = await GetCloudBlobContainerAsync();
             CloudBlockBlob blob = container.GetBlockBlobReference(arquivo.Url);
 
-            Stream stream = await blob.OpenReadAsync();
-
-            return PrepararJson(arquivo, stream);
+            return await blob.OpenReadAsync();
         }
 
         public async Task<long> MergeChunksAsync(string fileUrl, string fileToken)
@@ -146,29 +144,6 @@ namespace WebUI.Classes
             int maxLength = chunksBlobs.Max(x => x.Length);
 
             return chunksBlobs.OrderBy(x => x.PadLeft(maxLength, '0'));
-        }
-
-        private string PrepararJson(Arquivo arquivo, Stream stream)
-        {
-            string json = String.Empty;
-
-            using (stream)
-            {
-                using (BinaryReader br = new BinaryReader(stream))
-                {
-                    var jss = new JavaScriptSerializer();
-                    jss.MaxJsonLength = Int32.MaxValue;
-
-                    json = jss.Serialize(new
-                    {
-                        NomeArquivo = arquivo.Nome,
-                        MimeType = MimeMapping.GetMimeMapping(arquivo.Nome),
-                        Buffer = br.ReadBytes((int)stream.Length)
-                    });
-                }
-            }
-
-            return json;
         }
     }
 }

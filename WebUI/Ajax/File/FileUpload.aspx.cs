@@ -49,6 +49,7 @@ namespace WebUI.Ajax.File
 
             Arquivo novoArquivo = ArquivoFactory.Create(arquivo.FileName, false, parent);
             novoArquivo.Tamanho = arquivo.ContentLength;
+            novoArquivo.MimeType = arquivo.ContentType;
 
             await _arquivoRepository.AddAsync(novoArquivo);
 
