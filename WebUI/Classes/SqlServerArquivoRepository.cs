@@ -168,7 +168,7 @@ namespace WebUI.Classes
 
                     SqlCommand sqlCommand = sqlConnection.CreateCommand();
 
-                    sqlCommand.CommandText = "select * from Arquivo where fk_parent = @param0";
+                    sqlCommand.CommandText = "select * from Arquivo where fk_parent = @param0 order by ind_diretorio desc, nome";
 
                     sqlCommand.Parameters.AddWithValue("@param0", id);
 
