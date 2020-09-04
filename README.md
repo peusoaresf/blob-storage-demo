@@ -2,4 +2,4 @@
 
 Simples aplicação web para armazenamento de arquivos em nuvem. 
 
-Permite armazenar no Sistema de Arquivos do servidor ou no serviço Azure Blob Storage.
+Permite armazenar diretamente no Sistema de Arquivos do servidor ou utilizando o serviço Azure Blob Storage.
